@@ -8,6 +8,9 @@ const pane = new Pane()
 // Initialize the Scene
 const scene = new THREE.Scene()
 
+// Initialize the texture loader
+const textureLoader = new THREE.TextureLoader()
+
 // Initialize the geometry
 const geometry = new THREE.BoxGeometry(1, 1, 1)
 const torusKnotGeometry = new THREE.TorusKnotGeometry(0.5, 0.15, 100, 16)
@@ -15,8 +18,24 @@ const planeGeometry = new THREE.PlaneGeometry(1, 1)
 const sphereGeometry = new THREE.SphereGeometry(0.5, 32, 32)
 const cylinderGeometry = new THREE.CylinderGeometry(0.5, 0.5, 1, 32)
 
+// Initialize the texture
+const grassAlbedo = textureLoader.load('textures/whispy-grass-meadow-bl/wispy-grass-meadow_albedo.png')
+const grassAo = textureLoader.load('textures/whispy-grass-meadow-bl/wispy-grass-meadow_ao.png')
+const grassHeight = textureLoader.load('/textures/whispy-grass-meadow-bl/wispy-grass-meadow_height.png')
+const grassMetallic = textureLoader.load('/textures/whispy-grass-meadow-bl/wispy-grass-meadow_metallic.png')
+const grassNormal = textureLoader.load('/textures/whispy-grass-meadow-bl/wispy-grass-meadow_normal-ogl.png')
+const grassRoughness = textureLoader.load('/textures/whispy-grass-meadow-bl/wispy-grass-meadow_roughness.png')
+
 // Initialize the material
-const material = new THREE.MeshBasicMaterial()
+const material = new THREE.MeshStandardMaterial({ map: grassAlbedo})
+material.map = grassAlbedo
+material.roughnessMap = grassRoughness
+material.roughness = 1
+
+material.metalnessMap = grassMetallic
+material.normalMap = grassNormal
+material.displacementMap = grassHeight
+material.displacementScale = 0.1
 
 // Initialize group
 const group = new THREE.Group()
@@ -30,7 +49,6 @@ knot.position.x = 1.5
 const plane = new THREE.Mesh(planeGeometry, material)
 plane.position.x = -1.5
 material.side = THREE.DoubleSide
-console.log(material)
 
 const sphere = new THREE.Mesh()
 sphere.geometry = sphereGeometry
@@ -53,17 +71,18 @@ scene.add(group)
 
 
 // Initialize the light
-const light = new THREE.AmbientLight('white', 0.4)
+const light = new THREE.AmbientLight('white', 1)
 scene.add(light)
 
-const pointLight = new THREE.PointLight('white', 1.2)
+const pointLight = new THREE.PointLight('white', 200)
 pointLight.position.set(5, 5, 5)
 scene.add(pointLight)
 
 // Initialize the camera
-const camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 200)
+const camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 10000)
 
 camera.position.z = 10
+camera.position.y = 5
 
 // Initialize the renderer
 const canvas = document.querySelector('.threejs')
@@ -88,12 +107,12 @@ window.addEventListener('resize', () => {
 // Render the scene
 const renderLoop = () => {
 
-  group.children.forEach((child) => {
-    if (child instanceof THREE.Mesh) {
-      child.rotation.y += 0.01
-    }
-  })
-
+  // group.children.forEach((child) => {
+  //   if (child instanceof THREE.Mesh) {
+  //     child.rotation.y += 0.01
+  //   }
+  // })
+  controls.update()
   renderer.render(scene, camera)
   window.requestAnimationFrame(renderLoop)
 }
