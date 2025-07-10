@@ -12,6 +12,7 @@
     "vite": "^7.0.3"
   },
   "dependencies": {
-    "three": "^0.178.0"
+    "three": "^0.178.0",
+    "tweakpane": "^4.0.5"
   }
 }
